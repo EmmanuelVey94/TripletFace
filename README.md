@@ -31,6 +31,8 @@ Installation des bibliothèques nécéssaire à l'entrainement du model
 ```
 Entrainement du model avec 4 époch. C'est suffisant pour obtenir un resultat utilisable pour la reconnaissance.
 J'ai aussi tester le model avec resnet-152. 
+J'ai joué avec certains des hyper paramètres comme le nombre d'époch ou bien la taille du batch ainsi que le learning rate. Cependant il est difficile d'observer avec quels paramètres le model est la plus performant puisque je n'ai pas réussi a utiliser le model.
+
 ```
 !python3 -m tripletface.train -s dataset/ -m model -e 4 
 ```
@@ -55,6 +57,38 @@ model = torch.jit.load("jitmodel.pt")
 ```
 On va maintenant utiliser le réseau sur quelques images d'une personne pour déterminer les centroïdes et les thresholds
 
+Voici un essaie infructueux des nombreuses chose que j'ai essayé de faire pour créer les centroïdes et les thresholds sur une image :
+```
+import torch
+import torch.nn as nn
+import os
+from tripletface.core.dataset import ImageFolder
+from torchvision import transforms
+
+model = torch.jit.load("jitmodel.pt")
+
+trans         = {
+    'train': transforms.Compose( [
+        transforms.RandomRotation( degrees = 360 ),
+        transforms.Resize( size = 224 ),
+        transforms.RandomCrop( size = 224 ),
+        transforms.RandomVerticalFlip( p = 0.5 ),
+        transforms.ColorJitter( brightness = .2, contrast = .2, saturation = .2, hue = .1 ),
+        transforms.ToTensor( ),
+        transforms.Lambda( lambda X: X * ( 1. - noise ) + torch.randn( X.shape ) * noise ),
+        transforms.Normalize( [ 0.485, 0.456, 0.406 ], [ 0.229, 0.224, 0.225 ] )
+    ] ),
+    'test':transforms.Compose( [
+        transforms.Resize( size = 224 ),
+        transforms.CenterCrop( size = 224 ),
+        transforms.ToTensor( ),
+        transforms.Normalize( [ 0.485, 0.456, 0.406 ], [ 0.229, 0.224, 0.225 ] )
+    ] )
+}
+images = ImageFolder( os.path.join( "dataset/", 'test'  ), trans[ 'test'  ] )
+model.eval(images[0][0])
+```
+Mais sans succès. Je n'arrive pas a "utiliser" le model sur l'image. Même après de longues recherches sur le net.
 
 
 
