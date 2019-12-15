@@ -36,6 +36,9 @@ J'ai joué avec certains des hyper paramètres comme le nombre d'époch ou bien 
 ```
 !python3 -m tripletface.train -s dataset/ -m model -e 4 
 ```
+Une fois exécuté on obtien un fichier model.pt qui contient tout les poids du model. Ainsi que l'ensemble des rendus graphique de la triplet Loss. Pour 4 epoch j'ai donc obtenu 4 rendus.
+
+
 
 Je vais maintenant utiliset un jit compile pour pouvoir utiliser rapidement le réseau de neurone sans avoir à le ré executer.
 
